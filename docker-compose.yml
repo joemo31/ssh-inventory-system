@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5050:5050"
+    volumes:
+      - inventory-data:/app/data
+    environment:
+      DB_PATH: /app/data/inventory.db
+      FRONTEND_DIR: /app/frontend
+    restart: unless-stopped
+
+volumes:
+  inventory-data:

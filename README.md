@@ -6,6 +6,29 @@ A full-stack web application for tracking airport site consumables.
 
 ## 🚀 Quick Start
 
+### Docker (recommended)
+
+**From GitHub Container Registry** (after the first workflow run):
+
+```bash
+docker run -d -p 5050:5050 -v ssh-inventory-data:/app/data --name ssh-inventory \
+  ghcr.io/joemo31/ssh-inventory-system:latest
+```
+
+Open **http://localhost:5050** and log in with `admin` / `admin123`.
+
+**From source** (clone the repo first):
+
+```bash
+docker compose up -d
+```
+
+Stop: `docker compose down` · View logs: `docker compose logs -f`
+
+Data is stored in a Docker volume (`inventory-data` with compose, or `ssh-inventory-data` with `docker run`).
+
+---
+
 ### Windows
 1. Double-click **START.bat**
 2. The browser opens automatically
@@ -21,8 +44,12 @@ chmod +x start.sh
 
 ## 📋 Requirements
 
+**Docker:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine + Compose
+
+**Without Docker:**
+
 - **Python 3.8 or higher** — https://python.org/downloads
-- **Flask** (auto-installed by start scripts)
+- **Flask** (auto-installed by start scripts, or `pip install -r requirements.txt`)
 
 ---
 
@@ -30,14 +57,17 @@ chmod +x start.sh
 
 ```
 ssh-inventory/
+├── Dockerfile             ← Container image definition
+├── docker-compose.yml     ← One-command local run
+├── requirements.txt
 ├── START.bat              ← Windows launcher (double-click this)
 ├── start.sh               ← Linux/Mac launcher
 ├── README.md
 ├── backend/
-│   ├── app.py             ← Flask API server (port 5050)
+│   ├── app.py             ← Flask API + serves UI (port 5050)
 │   └── inventory.db       ← SQLite database (auto-created)
 └── frontend/
-    └── index.html         ← Full web application (open in browser)
+    └── index.html         ← Web UI (also served at http://localhost:5050 in Docker)
 ```
 
 ---
@@ -106,19 +136,12 @@ The backend runs at `http://localhost:5050`
 
 ## 🖥️ Sharing on Local Network (Team Access)
 
-To let your whole team access the system from their own computers:
+**With Docker:** run the container on a host machine, then teammates open `http://YOUR_IP_ADDRESS:5050` in their browser (no config changes needed).
 
-1. Find your IP address: run `ipconfig` (Windows) or `ifconfig` (Linux)
-2. Edit `frontend/index.html` — change line:
-   ```js
-   const API = 'http://localhost:5050';
-   ```
-   to:
-   ```js
-   const API = 'http://YOUR_IP_ADDRESS:5050';
-   ```
-3. Share the `frontend/index.html` file with your team, or host it on a shared drive
-4. Everyone opens `index.html` in their browser — data is shared via the central backend
+**Without Docker:** start the backend on one PC, then either:
+
+- Have everyone open **http://YOUR_IP_ADDRESS:5050** if you serve the UI from Flask, or
+- For the legacy `file://` workflow, set the API in `frontend/index.html` to your host IP (see the `API` constant in the script section)
 
 ---
 

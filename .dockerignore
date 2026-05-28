@@ -1,0 +1,12 @@
+.git
+.gitignore
+__pycache__
+*.py[cod]
+.venv
+venv
+.env
+backend/inventory.db
+*.md
+START.bat
+start.sh
+.github

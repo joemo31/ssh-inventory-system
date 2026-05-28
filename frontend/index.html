@@ -1121,9 +1121,11 @@
 
   <script>
     // ═══════════════════════════════════════════════════════════════
-    // CONFIG — change this if your backend runs on a different port
+    // CONFIG — API base URL (auto-detected for Docker; file:// uses localhost)
     // ═══════════════════════════════════════════════════════════════
-    const API = 'http://192.168.0.5:5050';
+    const API = window.location.protocol === 'file:'
+      ? 'http://localhost:5050'
+      : window.location.origin;
 
     // ─── STATE ────────────────────────────────────────────────────
     let authToken = localStorage.getItem('ssh_token') || '';

@@ -7,11 +7,16 @@ Flask + SQLite | Port 5050
 import sqlite3, hashlib, secrets, json, os
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, send_from_directory
 
 app = Flask(__name__)
 SECRET_KEY = "ssh-inventory-secret-2026"
-DB_PATH = os.path.join(os.path.dirname(__file__), "inventory.db")
+DB_PATH = os.environ.get(
+    "DB_PATH", os.path.join(os.path.dirname(__file__), "inventory.db")
+)
+FRONTEND_DIR = os.environ.get(
+    "FRONTEND_DIR", os.path.join(os.path.dirname(__file__), "..", "frontend")
+)
 
 # ─── DB HELPERS ─────────────────────────────────────────────────────────────
 
@@ -44,6 +49,9 @@ def rows_to_list(rows):
 # ─── SCHEMA INIT ────────────────────────────────────────────────────────────
 
 def init_db():
+    db_dir = os.path.dirname(DB_PATH)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
     db = sqlite3.connect(DB_PATH)
     db.executescript("""
     PRAGMA foreign_keys = ON;
@@ -502,6 +510,13 @@ def get_activity():
     limit = int(request.args.get("limit", 20))
     logs = rows_to_list(query("SELECT a.*,u.name as user_name FROM activity_log a LEFT JOIN users u ON a.user_id=u.id ORDER BY a.created_at DESC LIMIT ?", (limit,)))
     return jsonify(logs)
+
+# ─── FRONTEND ────────────────────────────────────────────────────────────────
+
+@app.route("/")
+def serve_frontend():
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
 
 # ─── MAIN ────────────────────────────────────────────────────────────────────
 
