@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSH Inventory Management System 2026</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh
+    }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1f2e;
+      --surface2: #222840;
+      --border: #2d3555;
+      --accent: #4f7fff;
+      --accent2: #38bdf8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --card: #1e2537
+    }
+
+    /* LOGIN */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f1117 0%, #1a1f2e 100%)
+    }
+
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px
+    }
+
+    .login-badge {
+      background: linear-gradient(135deg, #4f7fff, #38bdf8);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      display: inline-block;
+      margin-bottom: 12px
+    }
+
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px
+    }
+
+    .login-sub {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .login-error {
+      background: #ef444420;
+      border: 1px solid #ef444440;
+      color: #ef4444;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none
+    }
+
+    /* APP */
+    #app {
+      display: none;
+      min-height: 100vh
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 224px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 10
+    }
+
+    .sidebar-logo {
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, #4f7fff, #38bdf8);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: .5px
+    }
+
+    .logo-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px
+    }
+
+    .nav {
+      padding: 12px 8px;
+      flex: 1;
+      overflow-y: auto
+    }
+
+    .nav-section {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--muted);
+      padding: 10px 8px 4px;
+      text-transform: uppercase
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 2px;
+      transition: all .15s;
+      user-select: none
+    }
+
+    .nav-item:hover {
+      background: var(--surface2);
+      color: var(--text)
+    }
+
+    .nav-item.active {
+      background: #4f7fff22;
+      color: #4f7fff;
+      font-weight: 600
+    }
+
+    .nav-item .icon {
+      font-size: 15px;
+      width: 18px;
+      text-align: center
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 700
+    }
+
+    .sidebar-user {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #4f7fff, #38bdf8)
+    }
+
+    .user-name {
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .user-role {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: capitalize
+    }
+
+    .logout-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px
+    }
+
+    .logout-btn:hover {
+      color: var(--danger)
+    }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      margin-left: 224px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 5
+    }
+
+    .page-title {
+      font-size: 16px;
+      font-weight: 700
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #3d6ef0
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface2);
+      color: var(--text)
+    }
+
+    .btn-danger {
+      background: #ef444415;
+      color: var(--danger);
+      border: 1px solid #ef444425
+    }
+
+    .btn-danger:hover {
+      background: #ef444425
+    }
+
+    .btn-success {
+      background: #10b98115;
+      color: var(--success);
+      border: 1px solid #10b98125
+    }
+
+    .btn-success:hover {
+      background: #10b98125
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: .7px
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px
+    }
+
+    .stat-icon {
+      font-size: 20px;
+      margin-bottom: 8px
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    /* GRIDS */
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px
+    }
+
+    .grid4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px
+    }
+
+    /* TABLES */
+    .table-wrap {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #1e2537;
+      color: var(--text);
+      vertical-align: middle
+    }
+
+    tr:hover td {
+      background: #ffffff05
+    }
+
+    tr:last-child td {
+      border-bottom: none
+    }
+
+    /* FORMS */
+    .form-group {
+      margin-bottom: 16px
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: .4px
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: border .15s
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px #4f7fff15
+    }
+
+    select.form-input option {
+      background: var(--surface2)
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    /* TABS */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      background: var(--surface2);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      width: fit-content
+    }
+
+    .tab {
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 500;
+      transition: all .15s;
+      user-select: none
+    }
+
+    .tab.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .3)
+    }
+
+    /* MODALS */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 88vh;
+      overflow-y: auto
+    }
+
+    .modal-header {
+      padding: 22px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px
+    }
+
+    .modal-close:hover {
+      background: var(--surface2);
+      color: var(--text)
+    }
+
+    .modal-body {
+      padding: 0 24px 24px
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border)
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .badge-success {
+      background: #10b98120;
+      color: #10b981
+    }
+
+    .badge-warning {
+      background: #f59e0b20;
+      color: #f59e0b
+    }
+
+    .badge-danger {
+      background: #ef444420;
+      color: #ef4444
+    }
+
+    .badge-info {
+      background: #38bdf820;
+      color: #38bdf8
+    }
+
+    .badge-purple {
+      background: #8b5cf620;
+      color: #8b5cf6
+    }
+
+    /* MISC */
+    .stock-bar {
+      height: 5px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px
+    }
+
+    .stock-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .6s
+    }
+
+    .alert {
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .alert-warning {
+      background: #f59e0b12;
+      border: 1px solid #f59e0b28;
+      color: #f59e0b
+    }
+
+    .alert-success {
+      background: #10b98112;
+      border: 1px solid #10b98128;
+      color: #10b981
+    }
+
+    .alert-info {
+      background: #38bdf812;
+      border: 1px solid #38bdf828;
+      color: #38bdf8
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted)
+    }
+
+    .empty-icon {
+      font-size: 36px;
+      margin-bottom: 10px
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--border)
+    }
+
+    .chip-remove {
+      cursor: pointer;
+      color: var(--danger);
+      font-size: 14px;
+      line-height: 1
+    }
+
+    .chip-remove:hover {
+      color: #ff6b6b
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .page-anim {
+      animation: fadeUp .2s ease
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .role-pill {
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .quick-action {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s
+    }
+
+    .quick-action:hover {
+      border-color: var(--accent);
+      background: #4f7fff0d
+    }
+
+    .quick-action .qa-icon {
+      font-size: 24px;
+      margin-bottom: 8px
+    }
+
+    .quick-action .qa-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted)
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .4);
+      animation: slideIn .2s ease
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    .toast-success {
+      border-color: #10b98140
+    }
+
+    .toast-danger {
+      border-color: #ef444440
+    }
+
+    /* RESPONSIVE */
+    @media(max-width:900px) {
+      .sidebar {
+        width: 56px
+      }
+
+      .sidebar .logo-title,
+      .sidebar .nav-item span:not(.icon),
+      .sidebar .nav-section,
+      .sidebar-user .user-name,
+      .sidebar-user .user-role {
+        display: none
+      }
+
+      .main {
+        margin-left: 56px
+      }
+
+      .grid4 {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:600px) {
+
+      .grid2,
+      .grid3,
+      .grid4 {
+        grid-template-columns: 1fr
+      }
+
+      .form-row {
+        grid-template-columns: 1fr
+      }
+
+      .content {
+        padding: 14px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toasts"></div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-badge">✈ SSH AIRPORT</div>
+        <div class="login-title">Inventory Management</div>
+        <div class="login-sub">Consumables Tracking System 2026</div>
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input" id="login-user" placeholder="Enter your username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="login-pass" placeholder="Enter your password"
+          autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" id="login-btn"
+        onclick="doLogin()">
+        Sign In
+      </button>
+      <div
+        style="margin-top:20px;padding:12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.8">
+        <strong style="color:var(--text)">Default Accounts:</strong><br>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app">
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-badge">SSH</div>
+          <div class="logo-title">Consumables IMS</div>
+        </div>
+        <div class="nav" id="nav">
+          <div class="nav-section">Overview</div>
+          <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard',this)"><span
+              class="icon">📊</span><span>Dashboard</span></div>
+          <div class="nav-section">Inventory</div>
+          <div class="nav-item" data-page="hp80" onclick="navigate('hp80',this)"><span class="icon">🖨️</span><span>HP
+              80A Cartridges</span></div>
+          <div class="nav-item" data-page="hp59x" onclick="navigate('hp59x',this)"><span class="icon">🖨️</span><span>HP
+              59X Cartridges</span></div>
+          <div class="nav-item" data-page="ldcs" onclick="navigate('ldcs',this)"><span class="icon">🏷️</span><span>LDCS
+              Materials</span></div>
+          <div class="nav-item" data-page="custom" onclick="navigate('custom',this)"><span
+              class="icon">🔧</span><span>Custom Heads</span></div>
+          <div class="nav-item" data-page="dcp" onclick="navigate('dcp',this)"><span class="icon">💾</span><span>DCP
+              Head & Rippon</span></div>
+          <div class="nav-section">System</div>
+          <div class="nav-item admin-only" data-page="admin" onclick="navigate('admin',this)"><span
+              class="icon">⚙️</span><span>Admin Panel</span></div>
+          <div class="nav-item admin-only" data-page="users" onclick="navigate('users',this)"><span
+              class="icon">👥</span><span>Users & Access</span></div>
+          <div class="nav-item" data-page="reports" onclick="navigate('reports',this)"><span
+              class="icon">📋</span><span>Monthly Reports</span></div>
+          <div class="nav-item" data-page="activity" onclick="navigate('activity',this)"><span
+              class="icon">📜</span><span>Activity Log</span></div>
+        </div>
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebar-avatar">MA</div>
+          <div>
+            <div class="user-name" id="sidebar-name">—</div>
+            <div class="user-role" id="sidebar-role">—</div>
+          </div>
+          <button class="logout-btn" title="Logout" onclick="doLogout()">⏻</button>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="main">
+        <div class="topbar">
+          <div class="page-title" id="page-title">Dashboard</div>
+          <div class="topbar-right">
+            <span style="font-size:12px;color:var(--muted)" id="today-date"></span>
+            <button class="btn btn-ghost" onclick="openModal('receiveModal')">📥 Receive Stock</button>
+            <button class="btn btn-primary" onclick="openModal('issueModal')">📤 Issue Item</button>
+          </div>
+        </div>
+        <div class="content page-anim" id="content">
+          <div style="display:flex;align-items:center;justify-content:center;height:200px">
+            <div class="spinner" style="width:32px;height:32px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIVE MODAL -->
+  <div class="modal-overlay" id="receiveModal" style="display:none" onclick="modalBgClick(event,'receiveModal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">📥 Receive Stock</div>
+        <button class="modal-close" onclick="closeModal('receiveModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Item Category *</label>
+          <select class="form-input" id="recv-cat" onchange="updateRecvSubtype()">
+            <option value="">Select category...</option>
+            <option value="hp80">HP 80A Cartridges</option>
+            <option value="hp59x">HP 59X Cartridges</option>
+            <option value="ldcs">LDCS Materials</option>
+            <option value="custom">Custom Printer Heads</option>
+            <option value="dcp">DCP Head & Rippon</option>
+          </select>
+        </div>
+        <div class="form-group" id="recv-subtype-wrap" style="display:none">
+          <label class="form-label">Material Type *</label>
+          <select class="form-input" id="recv-subtype"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" class="form-input" id="recv-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantity *</label>
+            <input type="number" class="form-input" id="recv-qty" placeholder="0" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supplier / Source *</label>
+          <input type="text" class="form-input" id="recv-supplier" placeholder="Company name or 'In our spare'">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Received By</label>
+          <input type="text" class="form-input" id="recv-by" placeholder="Name of person receiving">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Remarks</label>
+          <input type="text" class="form-input" id="recv-remarks" placeholder="Optional notes...">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('receiveModal')">Cancel</button>
+          <button class="btn btn-success" id="recv-submit" onclick="submitReceive()">✓ Record Receipt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ISSUE MODAL -->
+  <div class="modal-overlay" id="issueModal" style="display:none" onclick="modalBgClick(event,'issueModal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">📤 Issue / Deliver Item</div>
+        <button class="modal-close" onclick="closeModal('issueModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Item Category *</label>
+          <select class="form-input" id="issue-cat" onchange="updateIssueSubtype()">
+            <option value="">Select category...</option>
+            <option value="hp80">HP 80A Cartridges</option>
+            <option value="hp59x">HP 59X Cartridges</option>
+            <option value="ldcs">LDCS Materials</option>
+            <option value="custom">Custom Printer Heads</option>
+            <option value="dcp">DCP Head & Rippon</option>
+          </select>
+        </div>
+        <div class="form-group" id="issue-subtype-wrap" style="display:none">
+          <label class="form-label">Material Type *</label>
+          <select class="form-input" id="issue-subtype"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" class="form-input" id="issue-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantity *</label>
+            <input type="number" class="form-input" id="issue-qty" placeholder="0" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department / Company</label>
+          <input type="text" class="form-input" id="issue-dept" placeholder="e.g. BRS, Operations, Baggage Tracking...">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Delivered By</label>
+            <input type="text" class="form-input" id="issue-delivered-by" placeholder="Staff name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Received By</label>
+            <input type="text" class="form-input" id="issue-received-by" placeholder="Recipient name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Remarks</label>
+          <input type="text" class="form-input" id="issue-remarks" placeholder="e.g. Mail has been sent">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('issueModal')">Cancel</button>
+          <button class="btn btn-danger" id="issue-submit" onclick="submitIssue()">Issue Item</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD USER MODAL -->
+  <div class="modal-overlay" id="addUserModal" style="display:none" onclick="modalBgClick(event,'addUserModal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">👤 Add New User</div>
+        <button class="modal-close" onclick="closeModal('addUserModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input class="form-input" id="new-user-name" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Initials</label>
+            <input class="form-input" id="new-user-initials" placeholder="e.g. MA" maxlength="3">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Username *</label>
+            <input class="form-input" id="new-user-username" placeholder="Login username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="password" class="form-input" id="new-user-password" placeholder="Password">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Role *</label>
+            <select class="form-input" id="new-user-role">
+              <option value="admin">Administrator</option>
+              <option value="engineer">Engineer</option>
+              <option value="technician" selected>Technician</option>
+              <option value="reviewer">Night Reviewer</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input class="form-input" id="new-user-dept" placeholder="Department">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('addUserModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="submitAddUser()">Create User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // CONFIG — change this if your backend runs on a different port
+    // ═══════════════════════════════════════════════════════════════
+    const API = 'http://192.168.0.5:5050';
+
+    // ─── STATE ────────────────────────────────────────────────────
+    let authToken = localStorage.getItem('ssh_token') || '';
+    let currentUser = JSON.parse(localStorage.getItem('ssh_user') || 'null');
+    let currentPage = 'dashboard';
+    let dashData = null;
+    let departments = [];
+
+    // ─── INIT ─────────────────────────────────────────────────────
+    window.onload = async () => {
+      document.getElementById('recv-date').value = today();
+      document.getElementById('issue-date').value = today();
+      document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+      if (authToken && currentUser) {
+        showApp();
+      }
+    };
+
+    function today() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    // ─── API HELPER ───────────────────────────────────────────────
+    async function api(path, method = 'GET', body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(API + path, opts);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    // ─── AUTH ─────────────────────────────────────────────────────
+    async function doLogin() {
+      const btn = document.getElementById('login-btn');
+      const err = document.getElementById('login-error');
+      const username = document.getElementById('login-user').value.trim();
+      const password = document.getElementById('login-pass').value;
+      if (!username || !password) { showError('Please enter username and password'); return; }
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div> Signing in...';
+      err.style.display = 'none';
+      try {
+        const data = await fetch(API + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+        const d = await data.json();
+        if (!data.ok) throw new Error(d.error || 'Login failed');
+        authToken = d.token;
+        currentUser = d.user;
+        localStorage.setItem('ssh_token', authToken);
+        localStorage.setItem('ssh_user', JSON.stringify(currentUser));
+        showApp();
+      } catch (e) {
+        showError(e.message);
+        btn.disabled = false;
+        btn.innerHTML = 'Sign In';
+      }
+    }
+
+    function showError(msg) {
+      const err = document.getElementById('login-error');
+      err.textContent = msg;
+      err.style.display = 'flex';
+    }
+
+    function showApp() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      document.getElementById('sidebar-name').textContent = currentUser.name;
+      document.getElementById('sidebar-role').textContent = currentUser.role;
+      document.getElementById('sidebar-avatar').textContent = currentUser.initials || currentUser.name.slice(0, 2).toUpperCase();
+      // Hide admin-only items for non-admins
+      if (currentUser.role !== 'admin') {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+      }
+      navigate('dashboard', document.querySelector('[data-page="dashboard"]'));
+    }
+
+    async function doLogout() {
+      try { await api('/api/auth/logout', 'POST'); } catch (e) { }
+      localStorage.removeItem('ssh_token');
+      localStorage.removeItem('ssh_user');
+      authToken = ''; currentUser = null;
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('login-user').value = '';
+      document.getElementById('login-pass').value = '';
+    }
+
+    // ─── NAVIGATION ───────────────────────────────────────────────
+    const pageTitles = {
+      dashboard: 'Dashboard', hp80: 'HP 80A Cartridges', hp59x: 'HP 59X Cartridges',
+      ldcs: 'LDCS Materials', custom: 'Custom Printer Heads', dcp: 'DCP Head & Rippon',
+      admin: 'Admin Panel', users: 'Users & Access', reports: 'Monthly Reports', activity: 'Activity Log'
+    };
+
+    async function navigate(page, el) {
+      currentPage = page;
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.getElementById('page-title').textContent = pageTitles[page] || page;
+      const content = document.getElementById('content');
+      content.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:200px"><div class="spinner" style="width:28px;height:28px"></div></div>';
+      try {
+        const html = await buildPage(page);
+        content.innerHTML = html;
+        content.className = 'content page-anim';
+      } catch (e) {
+        content.innerHTML = `<div class="alert alert-warning">⚠️ Failed to load: ${e.message}. Make sure the backend server is running.</div>`;
+      }
+    }
+
+    async function buildPage(page) {
+      if (page === 'dashboard') return renderDashboard(await api('/api/dashboard'));
+      if (['hp80', 'hp59x', 'ldcs', 'custom', 'dcp'].includes(page)) return renderInventory(page, await api('/api/inventory/' + page));
+      if (page === 'admin') return renderAdmin();
+      if (page === 'users') return renderUsers(await api('/api/users'));
+      if (page === 'reports') return renderReports();
+      if (page === 'activity') return renderActivity(await api('/api/activity?limit=50'));
+      return '<div class="empty-state"><div class="empty-icon">🚧</div>Page coming soon</div>';
+    }
+
+    // ─── DASHBOARD ────────────────────────────────────────────────
+    function renderDashboard(d) {
+      const s = d.stock;
+      const alerts = d.alerts || [];
+      dashData = d;
+      let alertsHtml = '';
+      if (alerts.length > 0) {
+        alertsHtml = alerts.map(a =>
+          `<div class="alert alert-warning">⚠️ <strong>${catName(a.key)}</strong> is low — only ${a.value} remaining (threshold: ${a.threshold})</div>`
+        ).join('');
+      }
+      const recent = (d.recent_activity || []).slice(0, 6);
+      return `
+  ${alertsHtml}
+  <div class="grid4" style="margin-bottom:18px">
+    ${statCard('🖨️', 'HP 80A', s.hp80, 'cartridges', s.hp80 <= 10 ? 'danger' : 'success', 20)}
+    ${statCard('🖨️', 'HP 59X', s.hp59x, 'cartridges', s.hp59x <= 10 ? 'danger' : 'success', 20)}
+    ${statCard('🏷️', 'LDCS Labels', s.ldcs_label.toLocaleString(), 'labels', 'success', 20000, s.ldcs_label)}
+    ${statCard('📄', 'LDCS Boarding', s.ldcs_board.toLocaleString(), 'boarding', 'success', 50000, s.ldcs_board)}
+  </div>
+  <div class="grid3" style="margin-bottom:18px">
+    ${statCard('🔧', 'Custom Heads', s.custom, 'heads', s.custom <= 10 ? 'warning' : 'success', 100)}
+    ${statCard('💾', 'DCP Heads', s.dcp_head, 'heads', s.dcp_head <= 5 ? 'danger' : 'success', 30)}
+    ${statCard('🎞️', 'DCP Rippons', s.dcp_rippon, 'rippons', s.dcp_rippon <= 5 ? 'danger' : 'success', 50)}
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Stock Overview</div>
+      ${stockBar('HP 80A Cartridges', s.hp80, 20, '#ef4444')}
+      ${stockBar('HP 59X Cartridges', s.hp59x, 20, '#f59e0b')}
+      ${stockBar('LDCS Labels', s.ldcs_label, 20000, '#4f7fff')}
+      ${stockBar('LDCS Boarding', s.ldcs_board, 50000, '#38bdf8')}
+      ${stockBar('Custom Heads', s.custom, 100, '#10b981')}
+      ${stockBar('DCP Heads', s.dcp_head, 30, '#8b5cf6')}
+      ${stockBar('DCP Rippons', s.dcp_rippon, 50, '#f97316')}
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Quick Actions</div>
+        <div class="grid2" style="gap:10px">
+          <div class="quick-action" onclick="openModal('receiveModal')"><div class="qa-icon">📥</div><div class="qa-label">Receive Stock</div></div>
+          <div class="quick-action" onclick="openModal('issueModal')"><div class="qa-icon">📤</div><div class="qa-label">Issue Item</div></div>
+          <div class="quick-action" onclick="navigate('reports',document.querySelector('[data-page=reports]'))"><div class="qa-icon">📋</div><div class="qa-label">Monthly Report</div></div>
+          <div class="quick-action" onclick="navigate('activity',document.querySelector('[data-page=activity]'))"><div class="qa-icon">📜</div><div class="qa-label">Activity Log</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Recent Activity</div>
+        ${recent.length === 0 ? '<div class="empty-state" style="padding:20px">No activity yet</div>' :
+          recent.map(a => `
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+            <span style="color:var(--text)">${actionIcon(a.action)} ${a.details || a.action}</span>
+            <span style="color:var(--muted);white-space:nowrap;margin-left:8px">${fmtDate(a.created_at)}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+    }
+
+    function catName(key) {
+      const m = { hp80: 'HP 80A Cartridges', hp59x: 'HP 59X Cartridges', ldcs_label: 'LDCS Labels', ldcs_board: 'LDCS Boarding', custom: 'Custom Heads', dcp_head: 'DCP Heads', dcp_rippon: 'DCP Rippons' };
+      return m[key] || key;
+    }
+    function actionIcon(a) { return { receipt: '📥', issuance: '📤', login: '🔑' }[a] || '📌'; }
+    function fmtDate(s) { if (!s) return '—'; const d = new Date(s); return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); }
+
+    function statCard(icon, label, value, unit, status, max, raw) {
+      const num = typeof raw !== 'undefined' ? raw : (typeof value === 'number' ? value : parseInt((value + '').replace(/,/g, '')));
+      const pct = Math.min(100, Math.round(num / max * 100));
+      const col = status === 'danger' ? 'var(--danger)' : status === 'warning' ? 'var(--warning)' : 'var(--success)';
+      return `<div class="stat-card">
+    <div class="stat-icon">${icon}</div>
+    <div class="stat-label">${label}</div>
+    <div class="stat-value" style="color:${col}">${value}</div>
+    <div class="stat-sub">${unit}</div>
+    <div class="stock-bar"><div class="stock-fill" style="width:${pct}%;background:${col}"></div></div>
+  </div>`;
+    }
+    function stockBar(label, value, max, color) {
+      const pct = Math.min(100, Math.round(value / max * 100));
+      return `<div style="margin-bottom:13px">
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+      <span style="color:var(--muted)">${label}</span>
+      <span style="font-weight:600">${value.toLocaleString()}</span>
+    </div>
+    <div class="stock-bar"><div class="stock-fill" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+    }
+
+    // ─── INVENTORY PAGES ──────────────────────────────────────────
+    function renderInventory(key, d) {
+      const cat = d.category;
+      const receipts = d.receipts || [];
+      const issuances = d.issuances || [];
+      const remaining = d.remaining || {};
+      const subtypes = d.subtypes || [];
+
+      let remainingHtml = '';
+      if (subtypes.length > 0) {
+        remainingHtml = subtypes.map(st => `
+      <div class="stat-card">
+        <div class="stat-label">Remaining ${st}</div>
+        <div class="stat-value" style="color:${(remaining[st] || 0) <= 5 ? 'var(--danger)' : 'var(--success)'}">${(remaining[st] || 0).toLocaleString()}</div>
+        <div class="stat-sub">${cat.unit}</div>
+      </div>`).join('');
+      } else {
+        const rem = remaining.total || 0;
+        remainingHtml = `<div class="stat-card">
+      <div class="stat-label">Remaining ${cat.name}</div>
+      <div class="stat-value" style="color:${rem <= cat.low_stock_threshold ? 'var(--danger)' : 'var(--success)'}">${rem}</div>
+      <div class="stat-sub">${cat.unit}</div>
+    </div>`;
+      }
+
+      const recvTable = receipts.length === 0
+        ? '<div class="empty-state"><div class="empty-icon">📭</div>No receipts recorded yet</div>'
+        : `<div class="table-wrap"><table>
+        <tr><th>Date</th>${subtypes.length ? '<th>Type</th>' : ''}
+        <th>Supplier / Source</th><th>Received By</th><th>Qty</th><th>Remarks</th><th></th></tr>
+        ${receipts.map(r => `<tr>
+          <td>${r.date}</td>
+          ${subtypes.length ? `<td>${r.subtype ? `<span class="badge badge-info">${r.subtype}</span>` : '—'}</td>` : ''}
+          <td>${r.supplier}</td><td>${r.received_by || '—'}</td>
+          <td><span class="badge badge-success">+${r.quantity}</span></td>
+          <td>${r.remarks || '—'}</td>
+          <td>${currentUser.role === 'admin' ? `<button class="btn btn-sm btn-danger" onclick="deleteRecord('receipt',${r.id},'${key}')">✕</button>` : ''}</td>
+        </tr>`).join('')}
+      </table></div>`;
+
+      const issTable = issuances.length === 0
+        ? '<div class="empty-state"><div class="empty-icon">📭</div>No issuances recorded yet</div>'
+        : `<div class="table-wrap"><table>
+        <tr><th>Date</th>${subtypes.length ? '<th>Type</th>' : ''}
+        <th>Department</th><th>Received By</th><th>Delivered By</th><th>Qty</th><th>Remarks</th><th></th></tr>
+        ${issuances.map(i => `<tr>
+          <td>${i.date}</td>
+          ${subtypes.length ? `<td>${i.subtype ? `<span class="badge badge-purple">${i.subtype}</span>` : '—'}</td>` : ''}
+          <td>${i.department || '—'}</td><td>${i.received_by || '—'}</td><td>${i.delivered_by || '—'}</td>
+          <td><span class="badge badge-danger">-${i.quantity}</span></td>
+          <td>${i.remarks || '—'}</td>
+          <td>${currentUser.role === 'admin' ? `<button class="btn btn-sm btn-danger" onclick="deleteRecord('issuance',${i.id},'${key}')">✕</button>` : ''}</td>
+        </tr>`).join('')}
+      </table></div>`;
+
+      const noteMap = { ldcs: 'Note: 1 Roll = 175 Labels | 1 Packet = 1,000 Boarding passes', dcp: 'Record On Gate field for DCP issuances' };
+
+      return `
+  <div class="${subtypes.length > 1 ? 'grid2' : 'grid2'}" style="margin-bottom:18px">
+    ${remainingHtml}
+    <div class="card">
+      <div class="card-title">About This Category</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7">${cat.description}</p>
+      ${noteMap[key] ? `<div class="alert alert-info" style="margin-top:12px;margin-bottom:0">ℹ️ ${noteMap[key]}</div>` : ''}
+    </div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab(this,'recv-section','iss-section')">📥 Supplies Received (${receipts.length})</div>
+    <div class="tab" onclick="switchTab(this,'iss-section','recv-section')">📤 Delivered / Issued (${issuances.length})</div>
+  </div>
+  <div id="recv-section">
+    <div class="section-header">
+      <span style="font-size:13px;color:var(--muted)">${receipts.length} record(s)</span>
+      <button class="btn btn-success" onclick="openModal('receiveModal');document.getElementById('recv-cat').value='${key}';updateRecvSubtype()">+ Record Receipt</button>
+    </div>
+    <div class="card">${recvTable}</div>
+  </div>
+  <div id="iss-section" style="display:none">
+    <div class="section-header">
+      <span style="font-size:13px;color:var(--muted)">${issuances.length} record(s)</span>
+      <button class="btn btn-danger" onclick="openModal('issueModal');document.getElementById('issue-cat').value='${key}';updateIssueSubtype()">Issue Item</button>
+    </div>
+    <div class="card">${issTable}</div>
+  </div>`;
+    }
+
+    async function deleteRecord(type, id, catKey) {
+      if (!confirm('Delete this record? This cannot be undone.')) return;
+      try {
+        await api(`/api/${type === 'receipt' ? 'receipts' : 'issuances'}/${id}`, 'DELETE');
+        showToast('Record deleted', 'success');
+        navigate(catKey, document.querySelector(`[data-page="${catKey}"]`));
+      } catch (e) { showToast(e.message, 'danger'); }
+    }
+
+    // ─── ADMIN ────────────────────────────────────────────────────
+    async function renderAdmin() {
+      const cats = await api('/api/categories');
+      const depts = await api('/api/departments');
+      departments = depts;
+      return `
+  <div class="grid2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title">Low Stock Thresholds</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Alert triggers when stock falls at or below this value.</p>
+      ${cats.map(c => `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span style="flex:1;font-size:13px">${c.name}</span>
+          <input type="number" class="form-input" id="thresh-${c.key}" value="${c.low_stock_threshold}" style="width:80px;text-align:center">
+          <button class="btn btn-sm btn-primary" onclick="saveThreshold('${c.key}')">Save</button>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Report Settings</div>
+      <div class="alert alert-info" style="margin-bottom:14px">📧 Reports are sent to Mahmoud Ali and Eng. Sameh El-Sayed only at the beginning of each month.</div>
+      <div class="form-group">
+        <label class="form-label">Recipients</label>
+        <input class="form-input" value="Mahmoud Ali, Sameh El-Sayed" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Schedule</label>
+        <select class="form-input"><option>Beginning of each month</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">System Name</label>
+        <input class="form-input" value="SSH Consumables Inventory Management System 2026">
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Manage Departments</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px" id="dept-chips">
+      ${depts.map(d => `<div class="chip">${d.name}<span class="chip-remove" onclick="deleteDept(${d.id})">×</span></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:10px;max-width:400px">
+      <input class="form-input" id="new-dept-input" placeholder="New department name..." onkeydown="if(event.key==='Enter')addDept()">
+      <button class="btn btn-primary" onclick="addDept()">Add</button>
+    </div>
+  </div>`;
+    }
+
+    async function saveThreshold(key) {
+      const val = document.getElementById('thresh-' + key).value;
+      try {
+        await api('/api/categories/' + key + '/threshold', 'PUT', { threshold: parseInt(val) });
+        showToast('Threshold updated', 'success');
+      } catch (e) { showToast(e.message, 'danger'); }
+    }
+
+    async function addDept() {
+      const name = document.getElementById('new-dept-input').value.trim();
+      if (!name) return;
+      try {
+        await api('/api/departments', 'POST', { name });
+        document.getElementById('new-dept-input').value = '';
+        showToast('Department added', 'success');
+        navigate('admin', document.querySelector('[data-page="admin"]'));
+      } catch (e) { showToast(e.message, 'danger'); }
+    }
+
+    async function deleteDept(id) {
+      try {
+        await api('/api/departments/' + id, 'DELETE');
+        navigate('admin', document.querySelector('[data-page="admin"]'));
+      } catch (e) { showToast(e.message, 'danger'); }
+    }
+
+    // ─── USERS ────────────────────────────────────────────────────
+    function renderUsers(users) {
+      const roleColors = { admin: 'badge-danger', engineer: 'badge-info', technician: 'badge-success', reviewer: 'badge-purple' };
+      const rolePerms = {
+        admin: ['View All', 'Record Receipts', 'Issue Items', 'Admin Panel', 'Manage Users', 'Monthly Reports'],
+        engineer: ['View All', 'Record Receipts', 'Issue Items', '—', '—', 'Monthly Reports'],
+        technician: ['View All', 'Record Receipts', 'Issue Items', '—', '—', '—'],
+        reviewer: ['View All', 'Record Receipts', 'Issue Items', '—', '—', '—']
+      };
+      return `
+  <div class="section-header" style="margin-bottom:18px">
+    <span style="color:var(--muted);font-size:13px">${users.length} team members</span>
+    <button class="btn btn-primary" onclick="openModal('addUserModal')">+ Add User</button>
+  </div>
+  <div class="grid2">
+    ${users.map(u => {
+        const perms = rolePerms[u.role] || rolePerms.technician;
+        const permLabels = ['View All', 'Record Receipts', 'Issue Items', 'Admin Panel', 'Manage Users', 'Monthly Reports'];
+        return `<div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div style="width:42px;height:42px;border-radius:50%;background:#4f7fff22;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#4f7fff;flex-shrink:0">${u.initials || u.name.slice(0, 2)}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${u.name}</div>
+            <div style="font-size:11px;color:var(--muted)">${u.department || '—'}</div>
+          </div>
+          <span class="badge ${u.active ? 'badge-success' : 'badge-danger'}">${u.active ? 'Active' : 'Inactive'}</span>
+        </div>
+        <div style="margin-bottom:10px"><span class="badge ${roleColors[u.role] || 'badge-info'}">${u.role}</span></div>
+        <div class="divider" style="margin:10px 0"></div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Permissions</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${permLabels.map((p, i) => `<div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--muted)">${p}</span>
+            <span style="color:${perms[i] === '—' ? 'var(--danger)' : 'var(--success)'}">${perms[i] === '—' ? '✗ No' : '✓ Yes'}</span>
+          </div>`).join('')}
+        </div>
+        ${currentUser.role === 'admin' && u.id !== currentUser.id ? `
+        <div class="divider" style="margin:12px 0"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm btn-danger" style="flex:1" onclick="deactivateUser(${u.id},'${u.name}')">Remove</button>
+        </div>`: ''}</div>`;
+      }).join('')}
+  </div>`;
+    }
+
+    async function submitAddUser() {
+      const name = document.getElementById('new-user-name').value.trim();
+      const username = document.getElementById('new-user-username').value.trim();
+      const password = document.getElementById('new-user-password').value;
+      const role = document.getElementById('new-user-role').value;
+      const dept = document.getElementById('new-user-dept').value.trim();
+      const initials = document.getElementById('new-user-initials').value.trim();
+      if (!name || !username || !password) { showToast('Fill required fields', 'danger'); return; }
+      try {
+        await api('/api/users', 'POST', { name, username, password, role, department: dept, initials });
+        closeModal('addUserModal');
+        showToast('User created successfully', 'success');
+        navigate('users', document.querySelector('[data-page="users"]'));
+      } catch (e) { showToast(e.message, 'danger'); }
+    }
+
+    async function deactivateUser(id, name) {
+      if (!confirm(`Remove ${name}? They will no longer be able to log in.`)) return;
+      try {
+        await api('/api/users/' + id, 'DELETE');
+        showToast('User deactivated', 'success');
+        navigate('users', document.querySelector('[data-page="users"]'));
+      } catch (e) { showToast(e.message, 'danger'); }
+    }
+
+    // ─── REPORTS ──────────────────────────────────────────────────
+    async function renderReports() {
+      const now = new Date();
+      const curMonth = now.toISOString().slice(0, 7);
+      const data = await api('/api/reports/monthly?month=' + curMonth);
+      return `
+  <div class="alert alert-warning">📧 Monthly reports are confidential. Recipients: Mahmoud Ali and Eng. Sameh El-Sayed only.</div>
+  <div class="grid2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title">Generate Report</div>
+      <div class="form-group">
+        <label class="form-label">Month</label>
+        <input type="month" class="form-input" id="report-month" value="${curMonth}" onchange="loadMonthReport()">
+      </div>
+      <div id="report-totals" style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted)">Total Received</span><span class="badge badge-success">+${data.totals.received}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0">
+          <span style="color:var(--muted)">Total Issued</span><span class="badge badge-danger">-${data.totals.issued}</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:14px;justify-content:center" onclick="printReport()">🖨️ Print / Export Report</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Current Stock Snapshot</div>
+      ${dashData ? Object.entries(dashData.stock).map(([k, v]) => `
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
+          <span style="color:var(--muted)">${catName(k)}</span>
+          <span style="font-weight:600">${v.toLocaleString()}</span>
+        </div>`).join('') : '<div class="spinner"></div>'}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Receipts This Month (${data.receipts.length})</div>
+    ${data.receipts.length === 0 ? '<div class="empty-state" style="padding:20px">No receipts this month</div>' :
+          `<div class="table-wrap"><table>
+      <tr><th>Date</th><th>Category</th><th>Type</th><th>Supplier</th><th>Received By</th><th>Qty</th></tr>
+      ${data.receipts.map(r => `<tr><td>${r.date}</td><td>${r.cat_name}</td><td>${r.subtype || '—'}</td><td>${r.supplier}</td><td>${r.received_by || '—'}</td><td><span class="badge badge-success">+${r.quantity}</span></td></tr>`).join('')}
+    </table></div>`}
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">Issuances This Month (${data.issuances.length})</div>
+    ${data.issuances.length === 0 ? '<div class="empty-state" style="padding:20px">No issuances this month</div>' :
+          `<div class="table-wrap"><table>
+      <tr><th>Date</th><th>Category</th><th>Type</th><th>Department</th><th>Delivered By</th><th>Qty</th><th>Remarks</th></tr>
+      ${data.issuances.map(i => `<tr><td>${i.date}</td><td>${i.cat_name}</td><td>${i.subtype || '—'}</td><td>${i.department || '—'}</td><td>${i.delivered_by || '—'}</td><td><span class="badge badge-danger">-${i.quantity}</span></td><td>${i.remarks || '—'}</td></tr>`).join('')}
+    </table></div>`}
+  </div>`;
+    }
+
+    async function loadMonthReport() {
+      const m = document.getElementById('report-month').value;
+      try {
+        const data = await api('/api/reports/monthly?month=' + m);
+        document.getElementById('report-totals').innerHTML = `
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">Total Received</span><span class="badge badge-success">+${data.totals.received}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0">
+        <span style="color:var(--muted)">Total Issued</span><span class="badge badge-danger">-${data.totals.issued}</span>
+      </div>`;
+      } catch (e) { showToast(e.message, 'danger'); }
+    }
+
+    function printReport() {
+      window.print();
+    }
+
+    // ─── ACTIVITY LOG ─────────────────────────────────────────────
+    function renderActivity(logs) {
+      return `
+  <div class="card">
+    <div class="section-header">
+      <div class="card-title" style="margin:0">All Activity (${logs.length})</div>
+      <button class="btn btn-ghost" onclick="navigate('activity',document.querySelector('[data-page=activity]'))">↻ Refresh</button>
+    </div>
+    <div class="table-wrap"><table>
+      <tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr>
+      ${logs.length === 0 ? '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted)">No activity recorded</td></tr>' :
+          logs.map(l => `<tr>
+          <td style="white-space:nowrap;color:var(--muted)">${l.created_at ? new Date(l.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+          <td>${l.user_name || 'System'}</td>
+          <td><span class="badge ${l.action === 'receipt' ? 'badge-success' : l.action === 'issuance' ? 'badge-danger' : 'badge-info'}">${actionIcon(l.action)} ${l.action}</span></td>
+          <td style="color:var(--muted)">${l.details || '—'}</td>
+        </tr>`).join('')}
+    </table></div>
+  </div>`;
+    }
+
+    // ─── MODALS ───────────────────────────────────────────────────
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+    function modalBgClick(e, id) {
+      if (e.target === document.getElementById(id)) closeModal(id);
+    }
+
+    const subtypeMap = { ldcs: ['Label', 'Boarding'], dcp: ['Head', 'Rippon'] };
+
+    function updateRecvSubtype() {
+      const cat = document.getElementById('recv-cat').value;
+      const wrap = document.getElementById('recv-subtype-wrap');
+      const sel = document.getElementById('recv-subtype');
+      if (subtypeMap[cat]) {
+        wrap.style.display = '';
+        sel.innerHTML = subtypeMap[cat].map(s => `<option>${s}</option>`).join('');
+      } else wrap.style.display = 'none';
+    }
+    function updateIssueSubtype() {
+      const cat = document.getElementById('issue-cat').value;
+      const wrap = document.getElementById('issue-subtype-wrap');
+      const sel = document.getElementById('issue-subtype');
+      if (subtypeMap[cat]) {
+        wrap.style.display = '';
+        sel.innerHTML = subtypeMap[cat].map(s => `<option>${s}</option>`).join('');
+      } else wrap.style.display = 'none';
+    }
+
+    async function submitReceive() {
+      const cat = document.getElementById('recv-cat').value;
+      const qty = document.getElementById('recv-qty').value;
+      const date = document.getElementById('recv-date').value;
+      const supplier = document.getElementById('recv-supplier').value.trim();
+      if (!cat || !qty || !date || !supplier) { showToast('Fill all required fields', 'danger'); return; }
+      const btn = document.getElementById('recv-submit');
+      btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Saving...';
+      try {
+        const subtype = subtypeMap[cat] ? document.getElementById('recv-subtype').value : null;
+        await api('/api/receipts', 'POST', {
+          category_key: cat, subtype, date: date.split('-').reverse().join('/'),
+          supplier, quantity: parseInt(qty),
+          received_by: document.getElementById('recv-by').value,
+          remarks: document.getElementById('recv-remarks').value
+        });
+        showToast('Receipt recorded successfully', 'success');
+        closeModal('receiveModal');
+        document.getElementById('recv-cat').value = '';
+        document.getElementById('recv-qty').value = '';
+        document.getElementById('recv-supplier').value = '';
+        document.getElementById('recv-by').value = '';
+        document.getElementById('recv-remarks').value = '';
+        updateRecvSubtype();
+        if (['hp80', 'hp59x', 'ldcs', 'custom', 'dcp'].includes(currentPage)) {
+          navigate(currentPage, document.querySelector(`[data-page="${currentPage}"]`));
+        } else {
+          navigate('dashboard', document.querySelector('[data-page="dashboard"]'));
+        }
+      } catch (e) { showToast(e.message, 'danger'); }
+      finally { btn.disabled = false; btn.innerHTML = '✓ Record Receipt'; }
+    }
+
+    async function submitIssue() {
+      const cat = document.getElementById('issue-cat').value;
+      const qty = document.getElementById('issue-qty').value;
+      const date = document.getElementById('issue-date').value;
+      if (!cat || !qty || !date) { showToast('Fill all required fields', 'danger'); return; }
+      const btn = document.getElementById('issue-submit');
+      btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Saving...';
+      try {
+        const subtype = subtypeMap[cat] ? document.getElementById('issue-subtype').value : null;
+        await api('/api/issuances', 'POST', {
+          category_key: cat, subtype, date: date.split('-').reverse().join('/'),
+          quantity: parseInt(qty),
+          department: document.getElementById('issue-dept').value,
+          delivered_by: document.getElementById('issue-delivered-by').value,
+          received_by: document.getElementById('issue-received-by').value,
+          remarks: document.getElementById('issue-remarks').value
+        });
+        showToast('Issuance recorded successfully', 'success');
+        closeModal('issueModal');
+        document.getElementById('issue-cat').value = '';
+        document.getElementById('issue-qty').value = '';
+        document.getElementById('issue-dept').value = '';
+        document.getElementById('issue-delivered-by').value = '';
+        document.getElementById('issue-received-by').value = '';
+        document.getElementById('issue-remarks').value = '';
+        updateIssueSubtype();
+        if (['hp80', 'hp59x', 'ldcs', 'custom', 'dcp'].includes(currentPage)) {
+          navigate(currentPage, document.querySelector(`[data-page="${currentPage}"]`));
+        } else {
+          navigate('dashboard', document.querySelector('[data-page="dashboard"]'));
+        }
+      } catch (e) { showToast(e.message, 'danger'); }
+      finally { btn.disabled = false; btn.innerHTML = 'Issue Item'; }
+    }
+
+    // ─── TABS ─────────────────────────────────────────────────────
+    function switchTab(el, show, hide) {
+      el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      const s = document.getElementById(show), h = document.getElementById(hide);
+      if (s) s.style.display = ''; if (h) h.style.display = 'none';
+    }
+
+    // ─── TOASTS ───────────────────────────────────────────────────
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toasts');
+      const t = document.createElement('div');
+      t.className = `toast toast-${type}`;
+      t.innerHTML = `${type === 'success' ? '✅' : '❌'} ${msg}`;
+      c.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; t.style.transition = '.3s'; setTimeout(() => t.remove(), 300); }, 3500);
+    }
+  </script>
+</body>
+
+</html>
